@@ -1,0 +1,6 @@
+input/*
+!*/.gitkeep
+weights/*
+logs/*
+felt.zip
+

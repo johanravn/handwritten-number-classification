@@ -1,0 +1,16 @@
+version: '3'
+services:
+
+  custom:
+    build: ./src
+
+    volumes:
+    - ../handwritten-number-classification/src:/handwritten-number-classification/src
+    - ../handwritten-number-classification/input:/handwritten-number-classification/input
+    - ../handwritten-number-classification/weights:/handwritten-number-classification/weights
+    - ../handwritten-number-classification/logs:/handwritten-number-classification/logs
+
+
+    #Tensorboard port
+    ports:
+      - "6006:6006"
