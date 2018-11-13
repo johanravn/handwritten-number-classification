@@ -57,15 +57,15 @@ def train():
     y_train = np.array(train)[:, 1]
     x_train = np.array(train)[:, 0]
     Y_train = convert_to_categorical(y_train, len(classes), cls_mapping)
-    train_generator = BatchGenerator(x_train, Y_train, 24, (100, 500))
+    train_generator = BatchGenerator(x_train, Y_train, 16, (100, 500))
     print("length of train train_generator", len(train_generator))
 
     # Setup validation data
     y_valid = np.array(valid)[:, 1]
     x_valid = np.array(valid)[:, 0]
     Y_valid = convert_to_categorical(y_valid, len(classes), cls_mapping)
-    valid_generator = BatchGenerator(x_valid, Y_valid, 24, (100, 500))
-    print("length of train valid_generator", len(train_generator))
+    valid_generator = BatchGenerator(x_valid, Y_valid, 16, (100, 500))
+    print("length of train valid_generator", len(valid_generator))
 
     # Set up model for training 
     with tf.device('/cpu:0'):
@@ -94,7 +94,7 @@ def train():
     for i in range(1, 200):
         print(i)
         parallel_model.fit_generator(train_generator,
-                                     steps_per_epoch=1000,
+                                     steps_per_epoch=2787,
                                      epochs=1,
                                      verbose=1,
                                      validation_data=valid_generator,
@@ -103,11 +103,12 @@ def train():
                                      workers=6,
                                      use_multiprocessing=True)
         pred = parallel_model.predict_generator(valid_generator)
+        np.save("pred", pred)
+        np.save("y_valid", Y_valid)
         pred[pred >= 0.5] = 1
         pred[pred < 0.5] = 0
         print(classification_report(np.array(Y_valid), pred, target_names=cls_list))
-
-        #model.save_weights("weights/"+str(i)+".h5", overwrite=True)
+        model.save_weights("../weights/"+str(i)+".h5", overwrite=True)
 
 if __name__ == "__main__":
     train()

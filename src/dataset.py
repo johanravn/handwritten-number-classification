@@ -19,7 +19,7 @@ def create_cls_mapping(targets):
     for i in range(0, len(unique_targets)):
         cls_mapping[unique_targets[i]] = i
     print(cls_mapping)
-    return cls_mapping
+    return cls_mapping, unique_targets
 
 def convert_to_categorical(targets, num_classes, cls_mapping):
     new_y = []
@@ -37,7 +37,7 @@ def create_image(path, shape):
     img = cv2.imread(path)
     #print(img.shape)
     try:
-        # Cv2 uses flipped shape, should be verfied
+        # Cv2 uses flipped shape, should 
         img = cv2.resize(img, (shape[0], shape[1]))
     except cv2.error as e:
         #print(e)
@@ -88,6 +88,7 @@ def extract_path_and_target(line):
     file_path = line[0]
     target = line[1].strip('\n')
     if target == '':
+        return None
         if random.uniform(0, 1) < drop_chance:
             return None
         target = 0
