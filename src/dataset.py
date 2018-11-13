@@ -118,6 +118,9 @@ def load_annotations():
             if ret is None:
                 continue
             file_path, target = ret
+            # skip high frequency classes:
+            #if target == 111 or target == 183 or target == 531 or target == 555 or target == 899:
+            #    continue
             #print(file_path, target)
             directories = file_path.split('\\')
             # merge correct paths
