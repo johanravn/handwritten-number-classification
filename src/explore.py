@@ -22,7 +22,11 @@ def load_dataset():
 def check_duplicated_images(annotations):
     hashes = []
     dups = {}
+    i = 0
     for file_path, y in annotations:
+        i += 1
+        if i % 1000 == 0:
+            print(str(i) + "/" + str(len(annotations)))
         hash = hashlib.md5(cv2.imread(file_path)).hexdigest()
         hashes.append(hash)
     print(len(hashes))
