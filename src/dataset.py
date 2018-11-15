@@ -59,6 +59,28 @@ def remove_low_class_count(annotations, freq_dict):
     return new_anno, classes
 
 
+def remove_duplicates(annotations):
+    new_anno = []
+
+    # Setup train data
+    y = np.array(annotations)[:, 1]
+    x = np.array(annotations)[:, 0]
+
+    print("check duplicated files")
+    print(len(x))
+    print(len(set(x)))
+    dups = {}
+    for elem in x:
+        if elem not in dups:
+            dups[elem] = 1
+        else:
+            dups[elem] += 1
+    for anno in annotations:
+        if dups[anno[0]] ==1:
+            new_anno.append(anno)
+    return new_anno
+
+
 def get_class_frequency(array):
     array = np.array(array)
     print(array)
@@ -124,7 +146,7 @@ def load_annotations():
             #print(file_path, target)
             directories = file_path.split('\\')
             # merge correct paths
-            file_path = "../input/felt/"
+            file_path = "../input/black_white/"
             file_path += directories[len(directories) - 2]
             file_path += "/" + directories[len(directories) - 1]
             all_targets.append(int(target))
@@ -136,6 +158,7 @@ def load_annotations():
     useable_samples = [x for x in all_targets if x != 0]
     print("total number of useable samples", len(useable_samples))
     print("total number of samples", len(all_targets))
+    #annotations = remove_duplicates(annotations)
     annotations, classes = remove_low_class_count(annotations, freq_dict)
 
     return annotations, classes
