@@ -1,8 +1,8 @@
 import tensorflow as tf
 #os.environ["CUDA_VISIBLE_DEVICES"]="1"
 import numpy as np
-from dataset import load_annotations, BatchGenerator
-from dataset import convert_to_categorical, create_cls_mapping
+from dataset_single_digit import load_annotations, BatchGenerator, load_validation_data
+from dataset_single_digit import convert_to_categorical, create_cls_mapping
 import keras.backend as K
 from keras.applications import Xception, MobileNet, ResNet50, VGG16
 from keras.utils import multi_gpu_model
@@ -50,32 +50,32 @@ def train():
 
     annotations = shuffle(annotations, random_state=52)
     train, valid = train_test_split(annotations,
-                                    test_size=0.10,
+                                    test_size=0.1,
                                     random_state=52)
-
     # Setup train data
     y_train = np.array(train)[:, 1]
     x_train = np.array(train)[:, 0]
     Y_train = convert_to_categorical(y_train, len(classes), cls_mapping)
-    train_generator = BatchGenerator(x_train, Y_train, 16, (500, 100))
+    train_generator = BatchGenerator(x_train, Y_train, 256, (100, 100))
     print("length of train train_generator", len(train_generator))
 
     # Setup validation data
-    X_valid, Y_valid = load_validation_data(annotations, shape, cls_mapping)
+    X_valid, Y_valid = load_validation_data(valid, (100, 100), cls_mapping)
+    print("length of train valid_generator", len(X_valid))
 
     # Set up model for training 
     with tf.device('/cpu:0'):
         base_model = ResNet50(
                         include_top=False,
                         #weights='imagenet',
-                        input_shape=(100, 500, 3),
+                        input_shape=(100, 100, 3),
                         classes=len(classes),
                         )
         x = base_model.output
         x = Flatten()(x)
         x = Dense(len(classes), activation='softmax', name='predictions')(x)
         model = Model(inputs=base_model.input, outputs=x)
-        # model.load_weights("../models/ResNet50_all_epoch_6.h5")
+        #model.load_weights("../weights/1.h5")
     parallel_model = multi_gpu_model(model, gpus=2)
     
     #parallel_model = model
@@ -90,21 +90,22 @@ def train():
     for i in range(1, 200):
         print(i)
         parallel_model.fit_generator(train_generator,
-                                     steps_per_epoch=2236,
+                                     steps_per_epoch=415,
                                      epochs=1,
                                      verbose=1,
-                                     validation_data=valid_generator,
+                                     validation_data=(X_valid, Y_valid),
                                      # validation_steps=1586,
                                      max_queue_size=200,#
                                      workers=6,
                                      use_multiprocessing=True)
-        pred = parallel_model.predict_generator(valid_generator)
+        pred = parallel_model.predict(X_valid)
         np.save("pred", pred)
         np.save("y_valid", Y_valid)
         pred[pred >= 0.5] = 1
         pred[pred < 0.5] = 0
-        print(classification_report(np.array(Y_valid), pred, target_names=cls_list, digits=3))
-        model.save_weights("../weights/"+str(i)+".h5", overwrite=True)
+
+        print(classification_report(Y_valid, pred, target_names=cls_list, digits=3))
+        model.save_weights("../weights/weights_single_digit/"+str(i)+".h5", overwrite=True)
 
 if __name__ == "__main__":
     train()

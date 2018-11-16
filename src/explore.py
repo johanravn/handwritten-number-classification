@@ -55,4 +55,4 @@ def check_duplicates_annotations(annotations):
 if __name__== "__main__":
     dataset = load_dataset()
     check_duplicates_annotations(dataset)
-    check_duplicated_images(dataset)
+    #check_duplicated_images(dataset)

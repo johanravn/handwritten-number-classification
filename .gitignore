@@ -1,3 +1,6 @@
+*.__pycache__*
+*.swp
+data/*
 input/*
 !*/.gitkeep
 weights/*
