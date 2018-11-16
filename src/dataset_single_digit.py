@@ -111,6 +111,7 @@ def get_class_frequency(array):
     print("total unique usable classes", count)
     return freq_dict
 
+
 def extract_path_and_target(line):
     if line.find('label') != -1:
         return None
@@ -133,11 +134,12 @@ def extract_path_and_target(line):
         return None
     return file_path, target
 
+
 def convert_to_single_digits(annotations):
     new_anno = []
     count = 0
     for file_path, three_digit in annotations:
-        three_digit = random.randint(100, 999)
+        #three_digit = random.randint(100, 999)
         directories = file_path.split("/")
         new_file_path = "../input/single_digits/"
         new_file_path += directories[-1].split(".")[0] + "/"
@@ -157,6 +159,7 @@ def convert_to_single_digits(annotations):
             new_anno.append([path, int(str(three_digit)[i])])
     print("folders that don't exist or that does not have three images", count)
     return new_anno
+
 
 def load_annotations():
     #labels = open("../input/" + dataset_name + ".csv")
