@@ -8,3 +8,4 @@ logs/*
 felt.zip
 src/pred.npy
 src/y_valid.npy
+weights_single_digit.tar.gz
